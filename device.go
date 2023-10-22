@@ -130,8 +130,8 @@ func (d Device) ForwardLocal(localPort int, remotePort string, noRebind ...bool)
 
 func (d Device) Reverse(localPort, remotePort int, noRebind ...bool) (ret string, err error) {
 	command := ""
-	local := fmt.Sprintf("tcp:%d", localPort)
-	remote := fmt.Sprintf("tcp:%d", remotePort)
+	local := fmt.Sprintf("%d", localPort)
+	remote := fmt.Sprintf("%d", remotePort)
 
 	if len(noRebind) != 0 && noRebind[0] {
 		command = fmt.Sprintf("host-serial:%s:reverse:norebind:%s;%s", d.serial, local, remote)
