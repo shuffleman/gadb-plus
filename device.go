@@ -128,7 +128,7 @@ func (d Device) ForwardLocal(localPort int, remotePort string, noRebind ...bool)
 	return
 }
 
-func (d Device) Reverse(localPort, remotePort int, noRebind ...bool) (err error) {
+func (d Device) Reverse(localPort, remotePort int, noRebind ...bool) (ret string, err error) {
 	command := ""
 	local := fmt.Sprintf("tcp:%d", localPort)
 	remote := fmt.Sprintf("tcp:%d", remotePort)
@@ -139,7 +139,7 @@ func (d Device) Reverse(localPort, remotePort int, noRebind ...bool) (err error)
 		command = fmt.Sprintf("host-serial:%s:reverse:%s;%s", d.serial, local, remote)
 	}
 
-	_, err = d.adbClient.executeCommand(command, true)
+	ret, err = d.adbClient.executeCommand(command, true)
 	return
 }
 
