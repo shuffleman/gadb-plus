@@ -240,7 +240,12 @@ func (sync syncTransport) ReadStringN(size int) (s string, err error) {
 }
 
 func (sync syncTransport) ReadBytesN(size int) (raw []byte, err error) {
-	_ = sync.sock.SetReadDeadline(time.Now().Add(time.Second * sync.readTimeout))
+	if sync.readTimeout == 999 {
+		_ = sync.sock.SetReadDeadline(time.Time{})
+	} else {
+		_ = sync.sock.SetReadDeadline(time.Now().Add(time.Second * sync.readTimeout))
+	}
+
 	return _readN(sync.sock, size)
 }
 
