@@ -116,7 +116,7 @@ func (d Device) Forward(localPort, remotePort int, noRebind ...bool) (err error)
 func (d Device) ForwardLocal(localPort int, remotePort string, noRebind ...bool) (err error) {
 	command := ""
 	local := fmt.Sprintf("tcp:%d", localPort)
-	remote := fmt.Sprintf("tcp:%d", remotePort)
+	remote := fmt.Sprintf("localabstract:%s", remotePort)
 
 	if len(noRebind) != 0 && noRebind[0] {
 		command = fmt.Sprintf("host-serial:%s:forward:norebind:%s;%s", d.serial, local, remote)
@@ -124,6 +124,12 @@ func (d Device) ForwardLocal(localPort int, remotePort string, noRebind ...bool)
 		command = fmt.Sprintf("host-serial:%s:forward:%s;%s", d.serial, local, remote)
 	}
 
+	_, err = d.adbClient.executeCommand(command, true)
+	return
+}
+func (d Device) ForwardRemoveAll() (err error) {
+	command := ""
+	command = fmt.Sprintf("host-serial:%s:forward:remove;all", d.serial)
 	_, err = d.adbClient.executeCommand(command, true)
 	return
 }
