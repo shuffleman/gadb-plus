@@ -97,7 +97,8 @@ func (t transport) ReadStringN(size int) (s string, err error) {
 }
 
 func (t transport) ReadBytesN(size int) (raw []byte, err error) {
-	_ = t.sock.SetReadDeadline(time.Now().Add(time.Second * t.readTimeout))
+
+	_ = t.sock.SetReadDeadline(time.Time{}) //time.Now().Add(time.Second * t.readTimeout))
 	return _readN(t.sock, size)
 }
 
