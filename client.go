@@ -79,7 +79,6 @@ func (c Client) DeviceList() (devices []Device, err error) {
 	devices = make([]Device, 0, len(lines))
 
 	for i := range lines {
-		println(i)
 		line := strings.TrimSpace(lines[i])
 		if line == "" {
 			continue
@@ -98,7 +97,10 @@ func (c Client) DeviceList() (devices []Device, err error) {
 			key, val := split[0], split[1]
 			mapAttrs[key] = val
 		}
-		devices = append(devices, Device{adbClient: c, serial: fields[0], attrs: mapAttrs})
+		if fields[1] == "device" {
+			devices = append(devices, Device{adbClient: c, serial: fields[0], attrs: mapAttrs})
+		}
+
 	}
 
 	return
