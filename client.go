@@ -79,6 +79,7 @@ func (c Client) DeviceList() (devices []Device, err error) {
 	devices = make([]Device, 0, len(lines))
 
 	for i := range lines {
+		println(i)
 		line := strings.TrimSpace(lines[i])
 		if line == "" {
 			continue
