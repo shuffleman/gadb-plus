@@ -146,16 +146,16 @@ func (d Device) ForwardRemoveAll() (err error) {
 	_, err = d.adbClient.executeCommand(command, true)
 	return
 }
-func (d Device) ReverseForward(local, remote string, noRebind ...bool) (ret string, err error) {
+func (d Device) ReverseForward(local, remote string, noRebind ...bool) (ret []byte], err error) {
 	command := ""
 
 	if len(noRebind) != 0 && noRebind[0] {
-		command = fmt.Sprintf("host-serial:%s:reverse:forward:norebind:%s;%s", d.serial, local, remote)
+		command = fmt.Sprintf("reverse:forward:norebind:%s;%s", local, remote)
 	} else {
-		command = fmt.Sprintf("host-serial:%s:reverse:forward:%s;%s", d.serial, local, remote)
+		command = fmt.Sprintf("reverse:forward:%s;%s", local, remote)
 	}
 
-	ret, err = d.adbClient.executeCommand(command, true)
+	ret, err = d.executeCommand(command, true)
 	return
 }
 
@@ -383,7 +383,9 @@ func (d Device) ExecuteCommandTP(command string, onlyVerifyResponse ...bool) (re
 		return "", err
 	}
 	defer func() { _ = tp.Close() }()
-
+	if err = tp.Send(command); err != nil {
+		return "", err
+	}
 	if err = tp.Send(command); err != nil {
 		return "", err
 	}
