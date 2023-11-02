@@ -217,3 +217,31 @@ func (c Client) executeCommand(command string, onlyVerifyResponse ...bool) (resp
 	}
 	return
 }
+
+func (c Client) ExecuteCommandTP(command string, onlyVerifyResponse ...bool) (resp string, err error) {
+	if len(onlyVerifyResponse) == 0 {
+		onlyVerifyResponse = []bool{false}
+	}
+
+	var tp transport
+	if tp, err = c.createTransport(); err != nil {
+		return "", err
+	}
+	defer func() { _ = tp.Close() }()
+
+	if err = tp.Send(command); err != nil {
+		return "", err
+	}
+	if err = tp.VerifyResponse(); err != nil {
+		return "", err
+	}
+
+	if onlyVerifyResponse[0] {
+		return
+	}
+
+	if resp, err = tp.UnpackString(); err != nil {
+		return "", err
+	}
+	return
+}
