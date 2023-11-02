@@ -146,7 +146,7 @@ func (d Device) ForwardRemoveAll() (err error) {
 	_, err = d.adbClient.executeCommand(command, true)
 	return
 }
-func (d Device) ReverseForward(local, remote string, noRebind ...bool) (ret []byte], err error) {
+func (d Device) ReverseForward(local, remote string, noRebind ...bool) (ret []byte, err error) {
 	command := ""
 
 	if len(noRebind) != 0 && noRebind[0] {
