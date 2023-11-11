@@ -33,8 +33,10 @@ func (sync syncTransport) Send(command, data string) (err error) {
 	return _send(sync.sock, msg.Bytes())
 }
 
-func (sync syncTransport) SendStream(reader io.Reader) (err error) {
+func (sync syncTransport) SendStream(reader io.Reader, size int64, callback func(int) bool) (err error) {
 	syncMaxChunkSize := 64 * 1024
+	lastpercent := 0
+	reming := size
 	for err == nil {
 		tmp := make([]byte, syncMaxChunkSize)
 		var n int
@@ -43,9 +45,19 @@ func (sync syncTransport) SendStream(reader io.Reader) (err error) {
 			err = nil
 			break
 		}
+		reming = reming - int64(n)
 		if err == nil {
 			err = sync.sendChunk(tmp[:n])
 		}
+		tmpper := int(reming * 100 / size)
+		if tmpper != lastpercent {
+			lastpercent = tmpper
+			if !callback(lastpercent) {
+				err = errors.New("主动取消")
+				return
+			}
+		}
+
 	}
 
 	return
