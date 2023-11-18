@@ -15,7 +15,7 @@ type Client struct {
 }
 
 func NewClient() (Client, error) {
-	return NewClientWith("localhost")
+	return NewClientWith("127.0.0.1")
 }
 
 func NewClientWith(host string, port ...int) (adbClient Client, err error) {
