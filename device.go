@@ -373,7 +373,11 @@ func (d Device) Pull(remotePath string, dest io.Writer) (err error) {
 	err = sync.WriteStream(dest)
 	return
 }
+func (d Device) ChangeWIFI(port int) (string, error) {
 
+	raw, err := d.executeCommand(fmt.Sprintf("tcpip:%d:%s", port, d.serial))
+	return string(raw), err
+}
 func (d Device) ExecuteCommandTP(command string, onlyVerifyResponse ...bool) (resp string, err error) {
 	if len(onlyVerifyResponse) == 0 {
 		onlyVerifyResponse = []bool{false}
