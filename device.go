@@ -246,6 +246,44 @@ func (d Device) createDeviceTransport() (tp transport, err error) {
 	err = tp.VerifyResponse()
 	return
 }
+func (d Device) createDeviceTport() (tp transport, err error) {
+	if tp, err = newTransport(fmt.Sprintf("%s:%d", d.adbClient.host, d.adbClient.port)); err != nil {
+		return transport{}, err
+	}
+
+	if err = tp.Send(fmt.Sprintf("host:tport:serial:%s", d.serial)); err != nil {
+		return transport{}, err
+	}
+	err = tp.VerifyResponse()
+	return
+}
+
+func (d Device) ExecuteCommandTPort(command string, onlyVerifyResponse ...bool) (raw []byte, err error) {
+	if len(onlyVerifyResponse) == 0 {
+		onlyVerifyResponse = []bool{false}
+	}
+
+	var tp transport
+	if tp, err = d.createDeviceTport(); err != nil {
+		return nil, err
+	}
+	defer func() { _ = tp.Close() }()
+
+	if err = tp.Send(command); err != nil {
+		return nil, err
+	}
+
+	if err = tp.VerifyResponse(); err != nil {
+		return nil, err
+	}
+
+	if onlyVerifyResponse[0] {
+		return
+	}
+
+	raw, err = tp.ReadBytesAll()
+	return
+}
 
 func (d Device) executeCommand(command string, onlyVerifyResponse ...bool) (raw []byte, err error) {
 	if len(onlyVerifyResponse) == 0 {
