@@ -391,7 +391,7 @@ func (d Device) Push(source io.Reader, remotePath string, size int64, callback f
 	return
 }
 
-func (d Device) Pull(remotePath string, dest io.Writer) (err error) {
+func (d Device) Pull(remotePath string, dest io.Writer, callback func(int64) bool) (err error) {
 	var tp transport
 	if tp, err = d.createDeviceTransport(); err != nil {
 		return err
@@ -408,7 +408,7 @@ func (d Device) Pull(remotePath string, dest io.Writer) (err error) {
 		return err
 	}
 
-	err = sync.WriteStream(dest)
+	err = sync.WriteStream(dest, callback)
 	return
 }
 func (d Device) ChangeWIFI(port int) (string, error) {

@@ -120,8 +120,9 @@ func (sync syncTransport) VerifyStatus() (err error) {
 
 var syncReadChunkDone = errors.New("sync read chunk done")
 
-func (sync syncTransport) WriteStream(dest io.Writer) (err error) {
+func (sync syncTransport) WriteStream(dest io.Writer, callback func(int64) bool) (err error) {
 	var chunk []byte
+	var alllen int64
 	save := func() error {
 		if chunk, err = sync.readChunk(); err != nil && err != syncReadChunkDone {
 			return fmt.Errorf("sync read chunk: %w", err)
@@ -132,6 +133,8 @@ func (sync syncTransport) WriteStream(dest io.Writer) (err error) {
 		if err = _send(dest, chunk); err != nil {
 			return fmt.Errorf("sync write stream: %w", err)
 		}
+		alllen += int64(len(chunk))
+		callback(alllen)
 		return nil
 	}
 
