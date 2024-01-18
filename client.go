@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const AdbServerPort = 5037
@@ -150,8 +151,12 @@ func (c Client) ConnectNR(ip string, port ...int) (err error) {
 	if len(port) == 0 {
 		port = []int{AdbDaemonPort}
 	}
+	t := 0
+	if len(port) > 1 {
+		t = port[1]
+	}
 
-	if err = c.executeCommandnr(fmt.Sprintf("host:connect:%s:%d", ip, port[0])); err != nil {
+	if err = c.executeCommandnr(fmt.Sprintf("host:connect:%s:%d", ip, port[0]), t); err != nil {
 		return err
 	}
 	return
@@ -227,10 +232,7 @@ func (c Client) executeCommand(command string, onlyVerifyResponse ...bool) (resp
 	}
 	return
 }
-func (c Client) executeCommandnr(command string, onlyVerifyResponse ...bool) (err error) {
-	if len(onlyVerifyResponse) == 0 {
-		onlyVerifyResponse = []bool{false}
-	}
+func (c Client) executeCommandnr(command string, onlyVerifyResponse bool, t int) (err error) {
 
 	var tp transport
 	if tp, err = c.createTransport(); err != nil {
@@ -244,8 +246,10 @@ func (c Client) executeCommandnr(command string, onlyVerifyResponse ...bool) (er
 	if err = tp.VerifyResponse(); err != nil {
 		return err
 	}
-
-	if onlyVerifyResponse[0] {
+	if t > 0 {
+		time.Sleep(time.Duration(t) * time.Millisecond)
+	}
+	if onlyVerifyResponse {
 		return
 	}
 	return
