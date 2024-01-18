@@ -232,7 +232,10 @@ func (c Client) executeCommand(command string, onlyVerifyResponse ...bool) (resp
 	}
 	return
 }
-func (c Client) executeCommandnr(command string, onlyVerifyResponse bool, t int) (err error) {
+func (c Client) executeCommandnr(command string, t int, onlyVerifyResponse ...bool) (err error) {
+	if len(onlyVerifyResponse) == 0 {
+		onlyVerifyResponse = []bool{false}
+	}
 
 	var tp transport
 	if tp, err = c.createTransport(); err != nil {
@@ -249,7 +252,7 @@ func (c Client) executeCommandnr(command string, onlyVerifyResponse bool, t int)
 	if t > 0 {
 		time.Sleep(time.Duration(t) * time.Millisecond)
 	}
-	if onlyVerifyResponse {
+	if onlyVerifyResponse[0] {
 		return
 	}
 	return
